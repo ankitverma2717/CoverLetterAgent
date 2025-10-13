@@ -62,8 +62,6 @@ The backend requires credentials from the Google Cloud Platform to function. You
 
 #### A. Getting Google OAuth 2.0 Credentials
 
-This allows users to log in with their Google account.
-
 1. **Create a Google Cloud Project:**
    - Go to the [Google Cloud Console](https://console.cloud.google.com/)
    - Create a new project (e.g., "Cover Letter Agent")
@@ -99,13 +97,6 @@ This allows users to log in with their Google account.
    - Click **Create**
    - **Copy the Client ID and Client Secret** - you'll need these next
 
-#### B. Get a Gemini API Key
-
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Click **Get API Key**
-3. Create a new API key or use an existing one
-4. Copy the API key
-
 #### C. Configure application.properties
 
 1. Navigate to `src/main/resources/`
@@ -129,9 +120,9 @@ ai.provider.api.key=YOUR_GEMINI_API_KEY
 ```
 
 **Replace:**
-- `YOUR_GOOGLE_CLIENT_ID` - From Step A4
-- `YOUR_GOOGLE_CLIENT_SECRET` - From Step A4
-- `YOUR_GEMINI_API_KEY` - From Step B
+- `YOUR_GOOGLE_CLIENT_ID` - From Step A (OAuth 2.0 Client ID)
+- `YOUR_GOOGLE_CLIENT_SECRET` - From Step A (OAuth 2.0 Client Secret)
+- `YOUR_GEMINI_API_KEY` - Get from [Google AI Studio](https://makersuite.google.com/app/apikey)
 
 ---
 
