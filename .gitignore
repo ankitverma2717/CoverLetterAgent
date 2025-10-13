@@ -1,0 +1,24 @@
+# Local application properties file with secrets
+/src/main/resources/application.properties
+
+# Service account key file - EXTREMELY SENSITIVE
+/src/main/resources/gcp-credentials.json
+
+# Build output
+/build/
+/.gradle/
+/out/
+
+# IDE files
+.idea/
+*.iml
+
+# Node.js frontend dependencies and build output
+/frontend/node_modules/
+/frontend/.next/
+/frontend/npm-debug.log*
+/frontend/yarn-error.log*
+
+#code dump file
+/d.ps1
+/code_dump.txt
