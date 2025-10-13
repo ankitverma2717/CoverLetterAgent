@@ -39,7 +39,7 @@
 
 ## 🎯 About
 
-**CoverCraft AI** is a next-generation, AI-powered web application that revolutionizes the job application process. Built with cutting-edge technologies including **Gemini 1.5 Flash AI**, **Spring Boot**, and **Next.js**, CoverCraft analyzes your resume and job descriptions to generate perfectly tailored, professional cover letters in under 30 seconds.
+**CoverCraft AI** is a next-generation, AI-powered web application that revolutionizes the job application process. Built with cutting-edge technologies including **Gemini 2.5 Flash AI**, **Spring Boot**, and **Next.js**, CoverCraft analyzes your resume and job descriptions to generate perfectly tailored, professional cover letters in under 30 seconds.
 
 ### Why CoverCraft AI?
 
@@ -56,12 +56,12 @@
 ### Landing Page
 Experience our stunning landing page with god-level animations and a seamless user journey.
 
-![Landing Page Demo](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Landing+Page+Demo)
+![Landing Page Demo](<img width="2559" height="1409" alt="image" src="https://github.com/user-attachments/assets/cf484236-a1da-4400-9a30-50b861bd0c3d" />)
 
 ### Main Application
 Generate professional cover letters with an intuitive, drag-and-drop interface.
 
-![Application Demo](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Application+Demo)
+![Application Demo](<img width="2550" height="1392" alt="image" src="https://github.com/user-attachments/assets/b3c7a329-8f77-43d2-b5fa-2ac871453a05" />)
 
 **[🎥 Watch Full Video Demo →](#)**
 
@@ -83,7 +83,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 <td width="50%">
 
 ### 🤖 AI-Powered Generation
-- **Gemini 1.5 Flash Integration** - State-of-the-art AI
+- **Gemini 2.5 Flash Integration** - State-of-the-art AI
 - **Context-Aware Analysis** - Matches resume to job
 - **Dynamic Content Creation** - Unique every time
 - **Professional Formatting** - Industry standards
@@ -120,7 +120,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![Landing Hero](https://via.placeholder.com/1200x500/1a1a2e/eee8f7?text=Hero+Section+-+CoverCraft+AI)
+![Landing Hero](<img width="2559" height="1409" alt="image" src="https://github.com/user-attachments/assets/a1359c5f-ac81-4316-9a40-15f96dbb077c" />)
 
 *Beautiful hero section with gradient animations and floating stats*
 
@@ -130,7 +130,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![Features Section](https://via.placeholder.com/1200x400/1a1a2e/eee8f7?text=Features+Section)
+![Features Section](<img width="2284" height="1282" alt="image" src="https://github.com/user-attachments/assets/7c5eb5a2-1188-47fc-807b-5a3d8e3cb9be" />)
 
 *Interactive feature cards with hover effects*
 
@@ -140,7 +140,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![How It Works](https://via.placeholder.com/1200x400/1a1a2e/eee8f7?text=How+It+Works+Section)
+![How It Works](<img width="2118" height="869" alt="image" src="https://github.com/user-attachments/assets/6b6ae9f6-3a13-41e5-bb2e-2cf719664811" />)
 
 *Step-by-step visual guide with progress indicators*
 
@@ -152,7 +152,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![Main App Interface](https://via.placeholder.com/1200x600/1a1a2e/eee8f7?text=Main+Application+Dashboard)
+![Main App Interface](<img width="2529" height="1382" alt="image" src="https://github.com/user-attachments/assets/c9162215-f539-4354-b950-913c5b3d645b" />)
 
 *Split-screen interface: Job Description (Left) + Resume Upload (Right)*
 
@@ -169,7 +169,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![User Profile](https://via.placeholder.com/600x500/1a1a2e/eee8f7?text=User+Profile+Dropdown)
+![User Profile](<img width="678" height="892" alt="image" src="https://github.com/user-attachments/assets/f371a9da-024d-4e70-bd42-92293e880e99" />)
 
 *Profile dropdown showing user info, API key management, and permissions*
 
@@ -187,7 +187,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![API Key Modal](https://via.placeholder.com/800x500/1a1a2e/eee8f7?text=API+Key+Setup+Modal)
+![API Key Modal](<img width="987" height="627" alt="image" src="https://github.com/user-attachments/assets/689c9cc7-b852-4718-a25e-5c65201d41aa" />)
 
 *Step-by-step guide to obtain and enter Gemini API key*
 
@@ -205,7 +205,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![Preview Modal](https://via.placeholder.com/1000x600/1a1a2e/eee8f7?text=Cover+Letter+Preview)
+![Preview Modal](<img width="1140" height="1305" alt="image" src="https://github.com/user-attachments/assets/85cc75a1-2e58-4e54-9f25-275564a2d1b7" />)
 
 *Preview generated content before creating the document*
 
@@ -223,7 +223,7 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 <div align="center">
 
-![Document Viewer](https://via.placeholder.com/1200x600/1a1a2e/eee8f7?text=PDF+Document+Viewer)
+![Document Viewer](<img width="1321" height="1310" alt="image" src="https://github.com/user-attachments/assets/ee73dc6b-9b4f-4e9b-819a-e1d2728ba4a5" />)
 
 *Embedded PDF viewer with download functionality*
 
@@ -262,7 +262,7 @@ Next.js 15.5.4
 ```
 
 ### APIs & Services
-- **Google Gemini API** - gemini-1.5-flash (AI generation)
+- **Google Gemini API** - gemini-2.5-flash (AI generation)
 - **Google OAuth 2.0** - User authentication
 - **Google Docs API** - Document creation
 - **Google Drive API** - PDF export
