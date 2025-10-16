@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Zap, FileText, CheckCircle, ArrowRight, Star, Users, Clock, Shield } from 'lucide-react';
+import { Sparkles, Zap, FileText, ArrowRight, Star, Clock, Shield } from 'lucide-react';
 
 export default function LandingPage() {
   const [scrollY, setScrollY] = useState(0);
