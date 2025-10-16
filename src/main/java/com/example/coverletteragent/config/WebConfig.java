@@ -15,8 +15,8 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 // Allow requests from our Next.js frontend development server
                 registry.addMapping("/api/**") // Apply CORS to our API endpoints
-                        .allowedOrigins("http://localhost:3000") // The origin of the frontend app
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
+                        .allowedOrigins("http://localhost:3000", "cover-letter-agent-et3g.vercel.app")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*") // Allow all headers
                         .allowCredentials(true);
             }
