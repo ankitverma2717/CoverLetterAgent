@@ -147,4 +147,30 @@ public class GeminiServiceImpl implements AIService {
     private static class GeminiContent { public List<GeminiPart> parts; }
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class GeminiPart { public String text; }
+
+    @Override
+    public String transformResumeContent(String resumeText, String jobDescription, String apiKey) {
+        String prompt = buildResumeTransformPrompt(resumeText, jobDescription);
+        String requestBody = buildGeminiRequestBody(prompt);
+        String finalUrl = apiUrl + "?key=" + apiKey;
+        HttpEntity<String> request = new HttpEntity<>(requestBody, new HttpHeaders() {{
+            setContentType(MediaType.APPLICATION_JSON);
+        }});
+        try {
+            String response = restTemplate.postForObject(finalUrl, request, String.class);
+            return parseGeminiResponse(response);
+        } catch (Exception e) {
+            // Handle exception
+            return "Error transforming resume.";
+        }
+    }
+
+    private String buildResumeTransformPrompt(String resumeText, String jobDescription) {
+        return "You are an expert resume writer. Your task is to take the provided resume and job description, and rewrite the resume to be tailored for the job description. " +
+                "Do not change the name of the person, the companies they worked for, or the names of the projects. " +
+                "You should, however, change the technologies and the descriptions of the work to be more aligned with a Node.js developer role. " +
+                "The output should be in LaTeX format using a standard resume template. " +
+                "Here is the original resume:\n\n" + resumeText + "\n\n" +
+                "Here is the target job description:\n\n" + jobDescription;
+    }
 }

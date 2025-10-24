@@ -15,7 +15,8 @@ export default function LandingPage() {
   }, []);
 
   const handleGetStarted = () => {
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      window.location.href = `${apiUrl}/oauth2/authorization/google`;
   };
 
   const features = [
