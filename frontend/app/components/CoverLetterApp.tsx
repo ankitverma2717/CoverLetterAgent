@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, X, FileText, Sparkles, LogIn, Download, User as UserIcon, LogOut, CheckCircle, ChevronDown, KeyRound, Rocket, Briefcase, FileInput } from 'lucide-react';
+import { Upload, X, FileText, Sparkles, LogIn, Download, User as UserIcon, LogOut, CheckCircle, ChevronDown, KeyRound, Rocket, FileInput } from 'lucide-react';
 
 // --- TYPE DEFINITIONS ---
 type User = {
@@ -317,7 +317,7 @@ export default function CoverLetterApp() {
             setCompanyName(extractedCompanyName || 'Company');
             setPreviewContent(result.content);
             setShowPreview(true);
-        } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
+        } catch (err) { setError(err instanceof Error ? err.message : 'An unknown error occurred.'); } finally { setIsLoading(false); }
     };
 
     const handleConfirmAndCreate = async () => {
@@ -329,10 +329,9 @@ export default function CoverLetterApp() {
             if (!response.ok) throw new Error(await response.text() || 'Failed to create document.');
             const result = await response.json();
             if (result.documentId) { setDocId(result.documentId); setShowDocViewer(true); setShowPreview(false); } else { throw new Error("Failed to get document ID from server."); }
-        } catch (err: any) { setError(err.message); } finally { setIsCreatingDoc(false); }
+        } catch (err) {  setError(err instanceof Error ? err.message : 'An unknown error occurred.'); } finally { setIsCreatingDoc(false); }
     };
 
-    // --- Resume Crafter Feature Handlers (NEW) ---
     const handleMainResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
@@ -365,7 +364,7 @@ export default function CoverLetterApp() {
             a.click();
             a.remove();
             window.URL.revokeObjectURL(url);
-        } catch (err: any) { setError(err.message); } finally { setIsCrafting(false); }
+        } catch (err) { setError(err instanceof Error ? err.message : 'An unknown error occurred.'); } finally { setIsCrafting(false); }
     };
 
 
@@ -444,7 +443,7 @@ export default function CoverLetterApp() {
                             <div className="bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-2xl border border-purple-500/20 p-6 flex flex-col">
                                 <div className="mb-4">
                                     <h2 className="text-xl font-semibold text-gray-100 mb-2">2. Target Job Description</h2>
-                                    <p className="text-sm text-gray-400">Paste the new job you're applying for.</p>
+                                    <p className="text-sm text-gray-400">Paste the new job you&apos;re applying for.</p>
                                 </div>
                                 <textarea value={targetJobDescription} onChange={(e) => setTargetJobDescription(e.target.value)} placeholder="Paste the Node.js job description here..." className="flex-1 w-full p-4 bg-gray-900/50 border-2 border-gray-700 rounded-xl resize-none focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-gray-200 placeholder-gray-500" />
                             </div>

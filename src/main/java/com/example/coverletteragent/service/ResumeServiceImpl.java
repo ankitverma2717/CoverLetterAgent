@@ -24,7 +24,7 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     private String extractTextFromPdf(MultipartFile file) throws IOException {
-        try (PDDocument document = Loader.loadPDF(file.getInputStream())) {
+        try (PDDocument document = Loader.loadPDF(file.getBytes())) {
             return new PDFTextStripper().getText(document);
         }
     }
