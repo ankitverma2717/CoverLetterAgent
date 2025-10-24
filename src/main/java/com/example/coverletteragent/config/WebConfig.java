@@ -13,11 +13,11 @@ public class WebConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                // Allow requests from our Next.js frontend development server
-                registry.addMapping("/api/**") // Apply CORS to our API endpoints
-                        .allowedOrigins("http://localhost:3000", "cover-letter-agent-et3g.vercel.app")
+
+                registry.addMapping("/api/**")
+                        .allowedOrigins("http://localhost:3000", "https://cover-letter-agent.vercel.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*") // Allow all headers
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
