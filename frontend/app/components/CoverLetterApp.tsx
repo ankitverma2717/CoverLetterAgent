@@ -19,64 +19,6 @@ type ResumeFile = {
     number: number;
 };
 
-
-// --- NEW: AUTHENTICATED FETCH WRAPPER ---
-async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
-    const token = localStorage.getItem('jwt_token');
-    if (!token) {
-        // Redirect to login or handle as you see fit
-        window.location.href = `${API_URL}/oauth2/authorization/google`;
-        throw new Error('Not authenticated');
-    }
-
-    // Set Authorization header
-    options.headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`,
-    };
-
-    let response = await fetch(url, options);
-
-    // If token is expired (401), try to refresh it
-    if (response.status === 401) {
-        console.log('Access token expired. Attempting to refresh...');
-        try {
-            const refreshResponse = await fetch(`${API_URL}/api/v1/auth/refresh`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            if (!refreshResponse.ok) {
-                // If refresh fails, logout user
-                throw new Error('Refresh token failed. Please log in again.');
-            }
-
-            const { token: newToken } = await refreshResponse.json();
-            localStorage.setItem('jwt_token', newToken);
-
-            // Retry the original request with the new token
-            options.headers = {
-                ...options.headers,
-                'Authorization': `Bearer ${newToken}`,
-            };
-            console.log('Token refreshed. Retrying original request...');
-            response = await fetch(url, options);
-
-        } catch (error) {
-            console.error('Failed to refresh token:', error);
-            // On failure, clear tokens and force re-login
-            localStorage.removeItem('jwt_token');
-            window.location.href = '/'; // Redirect to home/landing page
-            throw error;
-        }
-    }
-
-    return response;
-}
-
-
 // --- MODAL COMPONENTS ---
 
 const ApiKeyModal = ({ onSave, onCancel }: { onSave: (apiKey: string) => void, onCancel: () => void }) => {
@@ -219,7 +161,6 @@ const DocumentViewerModal = ({ docId, onClose, userName, companyName }: { docId:
         const fileName = `${cleanUserName}_${cleanCompanyName}_CoverLetter.pdf`;
 
         try {
-            // We use the original fetch here as we just need the blob data, not JSON
             const response = await fetch(previewUrl);
             if (!response.ok) throw new Error('Network response was not ok.');
             const blob = await response.blob();
@@ -347,6 +288,7 @@ export default function CoverLetterApp() {
 
     const handleLogin = () => { window.location.href = `${API_URL}/oauth2/authorization/google`; };
     const handleLogout = () => { localStorage.removeItem('jwt_token'); localStorage.removeItem('gemini_api_key'); setUser(null); setIsProfileOpen(false); };
+    const createAuthHeaders = (): HeadersInit => { const token = getAuthToken(); if (!token) { throw new Error("No authentication token found. Please log in again."); } return { 'Authorization': `Bearer ${token}` }; };
 
     // --- Cover Letter Feature Handlers ---
     const handleDrag = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); if (e.type === "dragenter" || e.type === "dragover") setDragActive(true); else if (e.type === "dragleave") setDragActive(false); };
@@ -365,7 +307,8 @@ export default function CoverLetterApp() {
         formData.append('jobDescription', jobDescription);
         formData.append('apiKey', apiKey);
         try {
-            const response = await fetchWithAuth(`${API_URL}/api/v1/cover-letter/generate-content`, { method: 'POST', body: formData });
+            const headers = createAuthHeaders();
+            const response = await fetch(`${API_URL}/api/v1/cover-letter/generate-content`, { method: 'POST', body: formData, headers: headers });
             if (!response.ok) throw new Error(await response.text() || 'Failed to generate content.');
             const result = await response.json();
             const lines = result.content.split('\n');
@@ -384,11 +327,8 @@ export default function CoverLetterApp() {
         setIsCreatingDoc(true);
         setError(null);
         try {
-            const response = await fetchWithAuth(`${API_URL}/api/v1/cover-letter/create-document`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: previewContent, title: `Cover Letter - ${companyName}` }),
-            });
+            const headers = { ...createAuthHeaders(), 'Content-Type': 'application/json' };
+            const response = await fetch(`${API_URL}/api/v1/cover-letter/create-document`, { method: 'POST', headers: headers, body: JSON.stringify({ content: previewContent, title: `Cover Letter - ${companyName}` }), });
             if (!response.ok) throw new Error(await response.text() || 'Failed to create document.');
             const result = await response.json();
             if (result.documentId) { setDocId(result.documentId); setShowDocViewer(true); setShowPreview(false); } else { throw new Error("Failed to get document ID from server."); }
@@ -418,7 +358,8 @@ export default function CoverLetterApp() {
         formData.append('jobDescription', targetJobDescription);
         formData.append('apiKey', apiKey);
         try {
-            const response = await fetchWithAuth(`${API_URL}/api/v1/resume/craft`, { method: 'POST', body: formData });
+            const headers = createAuthHeaders();
+            const response = await fetch(`${API_URL}/api/v1/resume/craft`, { method: 'POST', headers, body: formData });
             if (!response.ok) { throw new Error(await response.text() || 'Failed to craft resume.'); }
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
