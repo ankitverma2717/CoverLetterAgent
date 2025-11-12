@@ -1,6 +1,6 @@
-# Use a base image with Java 21 installed.
+# Use Eclipse Temurin (formerly AdoptOpenJDK) which is the recommended OpenJDK distribution
 # The 'slim' variant is a smaller, more secure image.
-FROM openjdk:21-slim
+FROM eclipse-temurin:21-jdk-jammy
 
 # Set the working directory inside the container
 WORKDIR /app
