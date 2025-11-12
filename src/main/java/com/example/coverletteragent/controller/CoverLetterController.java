@@ -41,18 +41,30 @@ public class CoverLetterController {
     @PostMapping("/create-document")
     public ResponseEntity<Map<String, String>> createDocument(
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody CreateDocRequest request) throws GeneralSecurityException, IOException {
+            @RequestBody CreateDocRequest request) {
 
-        String jwt = authHeader.substring(7);
-        String googleRefreshToken = tokenProvider.getGoogleRefreshTokenFromToken(jwt);
+        try {
+            String jwt = authHeader.substring(7);
+            String googleRefreshToken = tokenProvider.getGoogleRefreshTokenFromToken(jwt);
 
-        // MODIFIED: This now returns the document ID
-        String documentId = coverLetterService.createGoogleDoc(
-                googleRefreshToken,
-                request.getTitle(),
-                request.getContent()
-        );
-        // Return the ID, not the URL
-        return ResponseEntity.ok(Map.of("documentId", documentId));
+            if (googleRefreshToken == null || googleRefreshToken.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "error", "No refresh token available. Please log out and log in again to grant document creation permissions."
+                ));
+            }
+
+            // MODIFIED: This now returns the document ID
+            String documentId = coverLetterService.createGoogleDoc(
+                    googleRefreshToken,
+                    request.getTitle(),
+                    request.getContent()
+            );
+            // Return the ID, not the URL
+            return ResponseEntity.ok(Map.of("documentId", documentId));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Failed to create document: " + e.getMessage()
+            ));
+        }
     }
 }

@@ -32,11 +32,21 @@ public class CoverLetterServiceImpl implements CoverLetterService {
     @Override
     public String createGoogleDoc(String googleRefreshToken, String title, String content)
             throws IOException, GeneralSecurityException {
+        if (googleRefreshToken == null || googleRefreshToken.isEmpty()) {
+            logger.error("Refresh token is null or empty - cannot create Google Doc");
+            throw new IllegalArgumentException("Google refresh token is required to create documents. Please log out and log in again.");
+        }
+        
         logger.info("Creating Google Doc using refresh token...");
-        // This now returns the document ID
-        String documentId = googleDocsService.createCoverLetter(googleRefreshToken, title, content);
-        logger.info("Successfully created Google Doc with ID: {}", documentId);
-        return documentId;
+        try {
+            // This now returns the document ID
+            String documentId = googleDocsService.createCoverLetter(googleRefreshToken, title, content);
+            logger.info("Successfully created Google Doc with ID: {}", documentId);
+            return documentId;
+        } catch (Exception e) {
+            logger.error("Failed to create Google Doc: {}", e.getMessage(), e);
+            throw new IOException("Failed to create Google Doc. This may be due to expired credentials. Please log out and log in again.", e);
+        }
     }
 
     private String extractTextFromPdf(MultipartFile file) throws IOException {
