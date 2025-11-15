@@ -38,6 +38,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String accessToken = authorizedClient.getAccessToken().getTokenValue();
         String refreshToken = authorizedClient.getRefreshToken() != null ? authorizedClient.getRefreshToken().getTokenValue() : null;
 
+        // If no refresh token is available, redirect with an error
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            String errorRedirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
+                    .queryParam("error", "no_refresh_token")
+                    .queryParam("message", "Please revoke app access in your Google Account settings and log in again")
+                    .build().toUriString();
+            response.sendRedirect(errorRedirectUrl);
+            return;
+        }
+
         String jwt = tokenProvider.createToken(authentication, accessToken, refreshToken);
 
         String redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)

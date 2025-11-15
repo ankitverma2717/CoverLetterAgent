@@ -19,6 +19,6 @@
 /frontend/npm-debug.log*
 /frontend/yarn-error.log*
 
-#code dump file
-/d.ps1
-/code_dump.txt
+#Markdown files
+/GCP_SETUP_GUIDE_COMPLETE.md
+/JWT_SECRET_GENERATION_GUIDE.md
