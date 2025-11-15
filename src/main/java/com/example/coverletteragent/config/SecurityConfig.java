@@ -26,10 +26,10 @@ public class SecurityConfig {
 
     private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
-    public OAuth2AuthorizationRequestResolver authorizationRequestResolver() {
+    public OAuth2AuthorizationRequestResolver authorizationRequestResolver(
+            ClientRegistrationRepository clientRegistrationRepository) {
         DefaultOAuth2AuthorizationRequestResolver resolver = new DefaultOAuth2AuthorizationRequestResolver(
                 clientRegistrationRepository, "/oauth2/authorization");
         
@@ -64,7 +64,8 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization -> authorization
-                                .authorizationRequestResolver(authorizationRequestResolver())
+                                .authorizationRequestResolver(authorizationRequestResolver(
+                                        http.getSharedObject(ClientRegistrationRepository.class)))
                         )
                         .successHandler(authenticationSuccessHandler)
                 );
