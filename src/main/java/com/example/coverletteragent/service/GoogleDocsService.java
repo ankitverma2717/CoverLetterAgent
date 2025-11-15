@@ -31,13 +31,21 @@ public class GoogleDocsService {
 
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String clientSecret;
+    
+    @Value("${spring.security.oauth2.client.provider.google.token-uri}")
+    private String tokenUri;
 
     private UserCredentials getCredentials(String refreshToken) {
-        return UserCredentials.newBuilder()
-                .setClientId(clientId)
-                .setClientSecret(clientSecret)
-                .setRefreshToken(refreshToken)
-                .build();
+        try {
+            return UserCredentials.newBuilder()
+                    .setClientId(clientId)
+                    .setClientSecret(clientSecret)
+                    .setRefreshToken(refreshToken)
+                    .setTokenServerUri(new java.net.URI(tokenUri))
+                    .build();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create credentials", e);
+        }
     }
 
     public String createCoverLetter(String googleRefreshToken, String documentTitle, String aiContent)

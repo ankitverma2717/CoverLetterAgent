@@ -18,7 +18,3 @@
 /frontend/.next/
 /frontend/npm-debug.log*
 /frontend/yarn-error.log*
-
-#Markdown files
-/GCP_SETUP_GUIDE_COMPLETE.md
-/JWT_SECRET_GENERATION_GUIDE.md
