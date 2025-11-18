@@ -8,7 +8,8 @@
 
 [![Made with Love](https://img.shields.io/badge/Made%20with-❤️-red.svg)](https://github.com/yourusername/covercraft-ai)
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.4-black?logo=next.js)](https://nextjs.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen?logo=spring)](https://spring.io/projects/spring-boot)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.18-lightgrey?logo=express)](https://expressjs.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 [Demo](#-demo) • [Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Contributing](#-contributing)
@@ -39,7 +40,7 @@
 
 ## 🎯 About
 
-**CoverCraft AI** is a next-generation, AI-powered web application that revolutionizes the job application process. Built with cutting-edge technologies including **Gemini 2.5 Flash AI**, **Spring Boot**, and **Next.js**, CoverCraft analyzes your resume and job descriptions to generate perfectly tailored, professional cover letters in under 30 seconds.
+**CoverCraft AI** is a next-generation, AI-powered web application that revolutionizes the job application process. Built with modern JavaScript technologies including **Gemini 2.5 Flash AI**, **Node.js/Express**, and **Next.js**, CoverCraft analyzes your resume and job descriptions to generate perfectly tailored, professional cover letters in under 30 seconds.
 
 ### Why CoverCraft AI?
 
@@ -239,19 +240,20 @@ Generate professional cover letters with an intuitive, drag-and-drop interface.
 
 ## 🛠️ Tech Stack
 
-### Backend
+### Backend (Node.js)
 ```
-Java 21
-├── Spring Boot 3.5.6
-├── Spring Security (OAuth2 + JWT)
-├── Google API Client Libraries
-│   ├── Docs API v1-rev20210211-1.31.0
-│   └── Drive API (for PDF export)
-├── Apache PDFBox 3.0.2
-└── Gradle 8.14.3
+Node.js 18+
+├── Express.js 4.18
+├── Passport.js (OAuth2)
+├── jsonwebtoken (JWT)
+├── Google APIs (Node.js client)
+│   ├── Docs API
+│   └── Drive API (PDF export)
+├── pdf-parse (PDF processing)
+└── multer (File uploads)
 ```
 
-### Frontend
+### Frontend (Next.js)
 ```
 Next.js 15.5.4
 ├── React 19
@@ -262,7 +264,7 @@ Next.js 15.5.4
 ```
 
 ### APIs & Services
-- **Google Gemini API** - gemini-2.5-flash (AI generation)
+- **Google Gemini API** - gemini-1.5-flash (AI generation)
 - **Google OAuth 2.0** - User authentication
 - **Google Docs API** - Document creation
 - **Google Drive API** - PDF export
@@ -275,14 +277,12 @@ Before you begin, ensure you have the following installed:
 
 | Tool | Version | Download |
 |------|---------|----------|
-| Java (JDK) | 21+ | [Download](https://adoptium.net/) |
 | Node.js | 18+ | [Download](https://nodejs.org/) |
 | npm | 9+ | Included with Node.js |
 | Git | Latest | [Download](https://git-scm.com/) |
 
-**Recommended IDEs:**
-- Backend: IntelliJ IDEA Community Edition or Ultimate
-- Frontend: VS Code with TypeScript extension
+**Recommended IDE:**
+- VS Code with ESLint and TypeScript extensions
 
 ---
 
@@ -295,7 +295,7 @@ git clone https://github.com/yourusername/covercraft-ai.git
 cd covercraft-ai
 ```
 
-### 2️⃣ Backend Setup
+### 2️⃣ Backend Setup (Node.js)
 
 #### A. Configure Google Cloud Platform
 
@@ -339,7 +339,7 @@ Navigate to **APIs & Services > Library** and enable:
 3. Application type: **Web application**
 4. Authorized redirect URIs:
    ```
-   http://localhost:8080/login/oauth2/code/google
+   http://localhost:8080/api/v1/auth/google/callback
    ```
 5. Click **Create**
 6. **Copy Client ID and Client Secret** ⚠️
@@ -353,42 +353,48 @@ Navigate to **APIs & Services > Library** and enable:
 
 **Note:** Users will enter their own API keys in the app, but you need one for testing.
 
-#### C. Configure Application Properties
+#### C. Configure Environment Variables
 
-1. Navigate to `src/main/resources/`
-2. Create `application.properties` from the template:
+1. Navigate to `backend/`
+2. Create `.env` from the template:
 
 ```bash
-cp src/main/resources/application-template.properties src/main/resources/application.properties
+cd backend
+cp .env.template .env
 ```
 
-3. Edit `application.properties`:
+3. Edit `.env`:
 
-```properties
-spring.application.name=CoverLetterAgent
+```env
+# Server Configuration
+PORT=8080
+NODE_ENV=development
 
 # Google OAuth Credentials (from Step 4)
-spring.security.oauth2.client.registration.google.client-id=YOUR_CLIENT_ID_HERE
-spring.security.oauth2.client.registration.google.client-secret=YOUR_CLIENT_SECRET_HERE
-spring.security.oauth2.client.registration.google.scope=openid,email,profile,https://www.googleapis.com/auth/documents,https://www.googleapis.com/auth/drive.readonly
-spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+GOOGLE_CALLBACK_URL=http://localhost:8080/api/v1/auth/google/callback
 
-# JWT Secret (generate a random string)
-jwt.secret=YOUR_SUPER_SECRET_JWT_KEY_MIN_512_BITS_LONG
+# JWT Configuration (generate a random 64+ character string)
+JWT_SECRET=your_super_secret_jwt_key_minimum_512_bits_long
+JWT_EXPIRES_IN=1h
+JWT_REFRESH_EXPIRES_IN=7d
 
-# Gemini API
-ai.provider.api.url=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
+# Frontend URL
+FRONTEND_URL=http://localhost:3000
 
-# OAuth Settings (force refresh token)
-spring.security.oauth2.client.provider.google.authorization-uri=https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline
-spring.security.oauth2.client.provider.google.token-uri=https://oauth2.googleapis.com/token
+# Google API Scopes
+GOOGLE_SCOPES=openid,email,profile,https://www.googleapis.com/auth/documents,https://www.googleapis.com/auth/drive.readonly
+
+# AI Provider
+AI_PROVIDER_URL=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
 ```
 
-#### D. Build the Backend
+#### D. Install Backend Dependencies
 
 ```bash
-# From project root
-./gradlew clean build
+cd backend
+npm install
 ```
 
 ### 3️⃣ Frontend Setup
@@ -507,51 +513,54 @@ npm run dev
 ```
 covercraft-ai/
 │
-├── frontend/                      # Next.js Application
+├── backend/                    # Node.js/Express Backend
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── jwt.js              # JWT utilities
+│   │   │   └── passport.js         # OAuth configuration
+│   │   ├── controllers/
+│   │   │   ├── authController.js        # Auth endpoints
+│   │   │   ├── coverLetterController.js # Generation logic
+│   │   │   └── documentController.js    # Document management
+│   │   ├── middleware/
+│   │   │   ├── auth.js             # JWT authentication
+│   │   │   ├── errorHandler.js    # Error handling
+│   │   │   └── upload.js           # File upload config
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js       # Auth routes
+│   │   │   ├── coverLetterRoutes.js # Cover letter routes
+│   │   │   └── documentRoutes.js   # Document routes
+│   │   ├── services/
+│   │   │   ├── authService.js      # Auth business logic
+│   │   │   ├── geminiService.js    # AI service
+│   │   │   ├── googleDocsService.js # Google Docs/Drive
+│   │   │   └── pdfService.js       # PDF processing
+│   │   └── server.js               # Main entry point
+│   ├── .env.template               # Environment template
+│   ├── .gitignore
+│   ├── package.json
+│   └── README.md
+│
+├── frontend/                   # Next.js Application
 │   ├── app/
 │   │   ├── components/
 │   │   │   └── CoverLetterApp.tsx    # Main app component
 │   │   ├── landing/
 │   │   │   └── page.tsx              # Landing page
 │   │   ├── layout.tsx                # Root layout
-│   │   ├── page.tsx                  # Router (landing ↔ app)
-│   │   └── globals.css               # Global styles + animations
+│   │   ├── page.tsx                  # Router
+│   │   └── globals.css               # Global styles
 │   ├── public/                       # Static assets
 │   ├── package.json
 │   └── tsconfig.json
 │
-├── src/main/
-│   ├── java/com/example/coverletteragent/
-│   │   ├── config/
-│   │   │   ├── SecurityConfig.java          # OAuth + JWT
-│   │   │   ├── WebConfig.java               # CORS
-│   │   │   ├── JwtAuthenticationFilter.java # JWT filter
-│   │   │   └── CustomAuthenticationSuccessHandler.java
-│   │   │
-│   │   ├── controller/
-│   │   │   ├── AuthController.java          # Token refresh
-│   │   │   ├── CoverLetterController.java   # Generation endpoints
-│   │   │   └── DocumentController.java      # PDF download
-│   │   │
-│   │   ├── service/
-│   │   │   ├── AIService.java               # Interface
-│   │   │   ├── GeminiServiceImpl.java       # Gemini API calls
-│   │   │   ├── GoogleDocsService.java       # Docs creation + PDF
-│   │   │   ├── CoverLetterServiceImpl.java  # Business logic
-│   │   │   ├── AuthService.java             # Token refresh
-│   │   │   └── JwtTokenProvider.java        # JWT management
-│   │   │
-│   │   └── CoverLetterAgentApplication.java # Main entry point
-│   │
-│   └── resources/
-│       ├── application.properties           # Main config (gitignored)
-│       └── application-template.properties  # Template for users
-│
-├── gradle/                        # Gradle wrapper
-├── build.gradle                   # Dependencies
-├── settings.gradle
+├── QUICK_START_NODEJS.md       # Quick setup guide
+├── MIGRATION_GUIDE.md          # Technical details
+├── TESTING_CHECKLIST.md        # QA checklist
+├── start-nodejs-backend.bat    # Windows startup
+├── start-nodejs-backend.sh     # Linux/Mac startup
 ├── .gitignore
-└── README.md                      # This file
+└── README.md                   # This file
 ```
 
 ---
