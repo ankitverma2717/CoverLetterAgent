@@ -8,7 +8,7 @@ const CoverLetterApp = dynamic(() => import('./components/CoverLetterApp'), { ss
 
 // Google login handler (uses env variable for API URL)
 const handleGetStarted = () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080');
   window.location.href = `${apiUrl}/api/v1/auth/google`;
 };
 
