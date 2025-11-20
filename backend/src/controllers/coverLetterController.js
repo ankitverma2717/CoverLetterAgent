@@ -22,18 +22,24 @@ export const generateContent = async (req, res) => {
         const pdfBuffers = files.map(file => file.buffer);
         const resumeText = await pdfService.extractTextFromMultiple(pdfBuffers);
 
+        // Extract company name from job description
+        const companyName = await geminiService.extractCompanyName(jobDescription, apiKey);
+
         const coverLetterContent = await geminiService.generateCoverLetter(
             resumeText,
             jobDescription,
             apiKey
         );
 
-        res.json({ content: coverLetterContent });
+        res.json({
+            content: coverLetterContent,
+            companyName: companyName
+        });
     } catch (error) {
         console.error('Generate content error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Failed to generate cover letter',
-            message: error.message 
+            message: error.message
         });
     }
 };
@@ -57,9 +63,9 @@ export const createDocument = async (req, res) => {
         res.json({ documentId });
     } catch (error) {
         console.error('Create document error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Failed to create document',
-            message: error.message 
+            message: error.message
         });
     }
 };
@@ -72,7 +78,7 @@ export const previewContent = async (req, res) => {
             return res.status(400).json({ error: 'Content is required' });
         }
 
-        res.json({ 
+        res.json({
             preview: content,
             message: 'Content preview generated successfully'
         });

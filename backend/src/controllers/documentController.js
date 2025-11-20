@@ -5,6 +5,8 @@ export const downloadDocument = async (req, res) => {
     try {
         const { documentId } = req.params;
         const token = req.query.token;
+        const userName = req.query.userName || 'Candidate';
+        const companyName = req.query.companyName || 'Company';
 
         if (!documentId) {
             return res.status(400).json({ error: 'Document ID is required' });
@@ -26,16 +28,20 @@ export const downloadDocument = async (req, res) => {
         }
 
         const pdfBuffer = await googleDocsService.exportToPdf(documentId, accessToken);
-        const title = await googleDocsService.getDocumentTitle(documentId, accessToken);
+
+        // Format: Name_CoverLetter_CompanyName.pdf
+        const cleanUserName = userName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '_');
+        const cleanCompanyName = companyName.replace(/[^a-zA-Z0-9]/g, '_');
+        const filename = `${cleanUserName}_CoverLetter_${cleanCompanyName}.pdf`;
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${title}.pdf"`);
+        res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
         res.send(pdfBuffer);
     } catch (error) {
         console.error('Download document error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Failed to download document',
-            message: error.message 
+            message: error.message
         });
     }
 };
@@ -51,7 +57,7 @@ export const getDocumentInfo = async (req, res) => {
         const accessToken = req.user.accessToken;
         const title = await googleDocsService.getDocumentTitle(documentId, accessToken);
 
-        res.json({ 
+        res.json({
             documentId,
             title,
             url: `https://docs.google.com/document/d/${documentId}/edit`

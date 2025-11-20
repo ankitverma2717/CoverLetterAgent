@@ -26,8 +26,29 @@ export class GoogleDocsService {
 
             const documentId = createResponse.data.documentId;
 
+            // Set page margins to 0.5 inches (36 points) on all sides
+            const marginRequests = [{
+                updateDocumentStyle: {
+                    documentStyle: {
+                        marginTop: { magnitude: 36, unit: 'PT' },
+                        marginBottom: { magnitude: 36, unit: 'PT' },
+                        marginLeft: { magnitude: 36, unit: 'PT' },
+                        marginRight: { magnitude: 36, unit: 'PT' }
+                    },
+                    fields: 'marginTop,marginBottom,marginLeft,marginRight'
+                }
+            }];
+
+            // Apply margin settings
+            await this.docs.documents.batchUpdate({
+                documentId: documentId,
+                requestBody: {
+                    requests: marginRequests
+                }
+            });
+
             const requests = this.parseContentToRequests(content);
-            
+
             if (requests.length > 0) {
                 await this.docs.documents.batchUpdate({
                     documentId: documentId,
@@ -66,16 +87,30 @@ export class GoogleDocsService {
 
             if (line.startsWith('[H1]')) {
                 text = line.replace('[H1]', '').trim() + '\n';
-                style = { bold: true, fontSize: { magnitude: 16, unit: 'PT' } };
+                style = {
+                    bold: true,
+                    fontSize: { magnitude: 16, unit: 'PT' },
+                    weightedFontFamily: { fontFamily: 'Times New Roman', weight: 400 }
+                };
             } else if (line.startsWith('[H2]')) {
                 text = line.replace('[H2]', '').trim() + '\n';
-                style = { fontSize: { magnitude: 12, unit: 'PT' } };
+                style = {
+                    fontSize: { magnitude: 11, unit: 'PT' },
+                    weightedFontFamily: { fontFamily: 'Times New Roman', weight: 400 }
+                };
             } else if (line.startsWith('[H3]')) {
                 text = line.replace('[H3]', '').trim() + '\n';
-                style = { bold: true, fontSize: { magnitude: 11, unit: 'PT' } };
+                style = {
+                    bold: true,
+                    fontSize: { magnitude: 11, unit: 'PT' },
+                    weightedFontFamily: { fontFamily: 'Times New Roman', weight: 400 }
+                };
             } else {
                 text = line + '\n';
-                style = { fontSize: { magnitude: 11, unit: 'PT' } };
+                style = {
+                    fontSize: { magnitude: 11, unit: 'PT' },
+                    weightedFontFamily: { fontFamily: 'Times New Roman', weight: 400 }
+                };
             }
 
             requests.push({
@@ -99,6 +134,20 @@ export class GoogleDocsService {
                     }
                 });
             }
+
+            // Add justified alignment for each paragraph
+            requests.push({
+                updateParagraphStyle: {
+                    range: {
+                        startIndex: index,
+                        endIndex: endIndex
+                    },
+                    paragraphStyle: {
+                        alignment: 'JUSTIFIED'
+                    },
+                    fields: 'alignment'
+                }
+            });
 
             index += text.length;
         }

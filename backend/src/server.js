@@ -16,12 +16,28 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Security middleware
-app.use(helmet());
+// Security middleware - allow iframe embedding for PDF preview
+app.use(helmet({
+    contentSecurityPolicy: false,  // Disable CSP to allow iframe embedding
+    frameguard: false  // Disable X-Frame-Options to allow iframe
+}));
 
 // CORS configuration
+const allowedOrigins = [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'http://localhost:3001'  // Support both ports
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

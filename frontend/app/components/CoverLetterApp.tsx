@@ -153,12 +153,12 @@ const PreviewModal = ({ content, onConfirm, onCancel, isCreating }: { content: s
 
 const DocumentViewerModal = ({ docId, onClose, userName, companyName }: { docId: string, onClose: () => void, userName: string, companyName: string }) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : '';
-    const previewUrl = `${API_URL}/api/v1/document/${docId}/download?token=${token}`;
+    const previewUrl = `${API_URL}/api/v1/document/${docId}/download?token=${token}&userName=${encodeURIComponent(userName)}&companyName=${encodeURIComponent(companyName)}`;
 
     const handleDownload = async () => {
-        const cleanUserName = userName.replace(/ /g, '_');
-        const cleanCompanyName = companyName.replace(/ /g, '_');
-        const fileName = `${cleanUserName}_${cleanCompanyName}_CoverLetter.pdf`;
+        const cleanUserName = userName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '_');
+        const cleanCompanyName = companyName.replace(/[^a-zA-Z0-9]/g, '_');
+        const fileName = `${cleanUserName}_CoverLetter_${cleanCompanyName}.pdf`;
 
         try {
             const response = await fetch(previewUrl);
@@ -237,7 +237,7 @@ export default function CoverLetterApp() {
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
             const payload = JSON.parse(jsonPayload);
@@ -268,8 +268,64 @@ export default function CoverLetterApp() {
                 setUser(null);
             }
         }
+
+        // Load saved resumes from localStorage
+        const savedResumes = localStorage.getItem('saved_resumes');
+        if (savedResumes) {
+            try {
+                const resumeData = JSON.parse(savedResumes);
+                const loadedResumes = resumeData.map((item: any) => {
+                    // Convert base64 back to File
+                    const byteString = atob(item.data);
+                    const ab = new ArrayBuffer(byteString.length);
+                    const ia = new Uint8Array(ab);
+                    for (let i = 0; i < byteString.length; i++) {
+                        ia[i] = byteString.charCodeAt(i);
+                    }
+                    const blob = new Blob([ab], { type: 'application/pdf' });
+                    const file = new File([blob], item.name, { type: 'application/pdf' });
+                    return {
+                        id: item.id,
+                        file: file,
+                        name: item.name,
+                        number: item.number
+                    };
+                });
+                setResumes(loadedResumes);
+            } catch (error) {
+                console.error('Failed to load saved resumes:', error);
+            }
+        }
+
         setIsAuthLoading(false);
     }, []);
+
+    // Save resumes to localStorage whenever they change
+    useEffect(() => {
+        if (resumes.length > 0) {
+            const saveResumes = async () => {
+                const resumeData = await Promise.all(resumes.map(async (resume) => {
+                    const arrayBuffer = await resume.file.arrayBuffer();
+                    const bytes = new Uint8Array(arrayBuffer);
+                    let binary = '';
+                    for (let i = 0; i < bytes.byteLength; i++) {
+                        binary += String.fromCharCode(bytes[i]);
+                    }
+                    const base64 = btoa(binary);
+                    return {
+                        id: resume.id,
+                        name: resume.name,
+                        number: resume.number,
+                        data: base64
+                    };
+                }));
+                localStorage.setItem('saved_resumes', JSON.stringify(resumeData));
+            };
+            saveResumes();
+        } else {
+            localStorage.removeItem('saved_resumes');
+        }
+    }, [resumes]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -311,11 +367,9 @@ export default function CoverLetterApp() {
             const response = await fetch(`${API_URL}/api/v1/cover-letter/generate-content`, { method: 'POST', body: formData, headers: headers });
             if (!response.ok) throw new Error(await response.text() || 'Failed to generate content.');
             const result = await response.json();
-            const lines = result.content.split('\n');
-            let foundHiringManager = false;
-            let extractedCompanyName = '';
-            for (const line of lines) { if (line.trim().startsWith('[H3]Hiring Manager')) { foundHiringManager = true; continue; } if (foundHiringManager && line.trim().startsWith('[H3]')) { extractedCompanyName = line.trim().substring(4).trim(); break; } }
-            setCompanyName(extractedCompanyName || 'Company');
+
+            // Use company name from backend response
+            setCompanyName(result.companyName || 'Company');
             setPreviewContent(result.content);
             setShowPreview(true);
         } catch (err) {
@@ -397,7 +451,7 @@ export default function CoverLetterApp() {
                             onClick={() => setShowResumeCrafter(prev => !prev)}
                             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-200 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors"
                         >
-                            {showResumeCrafter ? <FileText className="w-4 h-4"/> : <Rocket className="w-4 h-4"/>}
+                            {showResumeCrafter ? <FileText className="w-4 h-4" /> : <Rocket className="w-4 h-4" />}
                             {showResumeCrafter ? 'Cover Letter Generator' : 'Craft a Resume'}
                         </button>
                         <div className="relative" ref={profileRef}>
@@ -435,7 +489,7 @@ export default function CoverLetterApp() {
                                 </div>
                                 <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-600 border-dashed rounded-xl cursor-pointer hover:bg-purple-500/5 hover:border-purple-500 transition-colors">
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <FileInput className="w-12 h-12 mb-3 text-purple-400"/>
+                                        <FileInput className="w-12 h-12 mb-3 text-purple-400" />
                                         <p className="mb-2 text-sm text-gray-300"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                                         <p className="text-xs text-gray-500">PDF only</p>
                                     </div>
@@ -444,7 +498,7 @@ export default function CoverLetterApp() {
                                 {mainResume && (
                                     <div className="mt-4 p-3 bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-lg border border-purple-500/30 flex items-center justify-between">
                                         <p className="text-sm font-medium text-gray-200 truncate">{mainResume.name}</p>
-                                        <button onClick={() => setMainResume(null)} className="p-1 hover:bg-red-500/20 rounded-full transition-colors"><X className="w-4 h-4 text-red-400"/></button>
+                                        <button onClick={() => setMainResume(null)} className="p-1 hover:bg-red-500/20 rounded-full transition-colors"><X className="w-4 h-4 text-red-400" /></button>
                                     </div>
                                 )}
                             </div>
