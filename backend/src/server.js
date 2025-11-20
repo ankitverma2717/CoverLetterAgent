@@ -98,11 +98,14 @@ if (process.env.NODE_ENV === 'production') {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV}`);
-    console.log(`🚀 Frontend URL: ${process.env.FRONTEND_URL}`);
-});
+
+// Start server (only in non-serverless environment)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on http://localhost:${PORT}`);
+        console.log(`📝 Environment: ${process.env.NODE_ENV}`);
+        console.log(`🚀 Frontend URL: ${process.env.FRONTEND_URL}`);
+    });
+}
 
 export default app;
