@@ -78,6 +78,23 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/cover-letter', coverLetterRoutes);
 app.use('/api/v1/document', documentRoutes);
 
+// Serve Next.js static files in production
+if (process.env.NODE_ENV === 'production') {
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    // Serve static files from Next.js build
+    app.use(express.static(path.join(__dirname, '../../frontend/.next/static')));
+    app.use(express.static(path.join(__dirname, '../../frontend/public')));
+
+    // Handle Next.js pages
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../../frontend/out/index.html'));
+    });
+}
+
 // Error handling middleware (must be last)
 app.use(errorHandler);
 

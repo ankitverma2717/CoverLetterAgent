@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Upload, X, FileText, Sparkles, LogIn, Download, User as UserIcon, LogOut, CheckCircle, ChevronDown, KeyRound, Rocket, FileInput } from 'lucide-react';
 
 // --- API URL ---
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' && window.location.origin) || 'http://localhost:8080';
 
 // --- TYPE DEFINITIONS ---
 type User = {
