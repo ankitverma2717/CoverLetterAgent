@@ -273,8 +273,14 @@ export default function CoverLetterApp() {
         const savedResumes = localStorage.getItem('saved_resumes');
         if (savedResumes) {
             try {
-                const resumeData = JSON.parse(savedResumes);
-                const loadedResumes = resumeData.map((item: any) => {
+                interface SavedResumeData {
+                    id: number;
+                    name: string;
+                    number: number;
+                    data: string;
+                }
+                const resumeData: SavedResumeData[] = JSON.parse(savedResumes);
+                const loadedResumes = resumeData.map((item) => {
                     // Convert base64 back to File
                     const byteString = atob(item.data);
                     const ab = new ArrayBuffer(byteString.length);
